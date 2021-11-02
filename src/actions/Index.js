@@ -1,15 +1,32 @@
 import axios from "axios";
-import { allPosts, specificPost, isLoggedIn } from "./ActionTypes";
+import {
+  allPosts,
+  specificPost,
+  isLoggedIn,
+  nextPage,
+  previousPage,
+} from "./ActionTypes";
 import { allPostsUrl, newPostUrl } from "../public/endpoints";
 //Middlewares
+let start = -10,
+  limit = 0;
+export const allPostsMiddleware = (arrow) => async (dispatch) => {
+  if (arrow === "forward") {
+    start += 10;
+    limit += 10;
+  } else if (arrow === "backward") {
+    start -= 10;
+    limit -= 10;
+  }
 
-export const allPostsMiddleware = () => async (dispatch) => {
   console.log("in all posts middle ware");
-  const response = await axios.get(allPostsUrl);
+  const response = await axios.get(
+    `https://jsonplaceholder.typicode.com/posts?_start=${start}&_limit=${limit}`
+  );
   console.log("all Posts ", response);
   dispatch({
     type: allPosts,
-    payload: response,
+    payload: response.data,
   });
 };
 
