@@ -3,10 +3,8 @@ import {
   allPosts,
   specificPost,
   isLoggedIn,
-  nextPage,
-  previousPage,
+  viewComments,
 } from "./ActionTypes";
-import { allPostsUrl, newPostUrl } from "../public/endpoints";
 //Middlewares
 let start = -10,
   limit = 0;
@@ -19,7 +17,7 @@ export const allPostsMiddleware = (arrow) => async (dispatch) => {
     limit -= 10;
   }
 
-  console.log("in all posts middle ware");
+  //console.log("in all posts middle ware");
   const response = await axios.get(
     `https://jsonplaceholder.typicode.com/posts?_start=${start}&_limit=${limit}`
   );
@@ -32,7 +30,7 @@ export const allPostsMiddleware = (arrow) => async (dispatch) => {
 
 export const isLoggedInMiddleware = () => (dispatch) => {
   const email = localStorage.getItem("email");
-  console.log("In logged in middle ware ");
+  //console.log("In logged in middle ware ");
   if (email) {
     dispatch({
       type: isLoggedIn,
@@ -46,11 +44,45 @@ export const isLoggedInMiddleware = () => (dispatch) => {
   }
 };
 
-export const specificPostMiddleware = () => async (dispatch) => {
-  const response = await axios.get(specificPost);
-  console.log("specific post ", response);
+export const specificPostMiddleware = (id) => async (dispatch) => {
+  console.log("in specific post middleware");
+  const response = await axios.get(
+    `https://jsonplaceholder.typicode.com/posts/${id}`
+  );
   dispatch({
     type: specificPost,
-    payload: response,
+    payload: response.data,
   });
+};
+
+export const deletePostMiddleware = (postId) => async (dispatch) => {
+  const res = await axios.delete(
+    `https://jsonplaceholder.typicode.com/posts/:${postId}`
+  );
+};
+
+export const editPostMiddleware = (postId, post) => async (dispatch) => {
+  const res = await axios.put(
+    `https://jsonplaceholder.typicode.com/posts/:${postId}`,
+    post
+  );
+  console.log("respose of put API :", res);
+};
+
+export const viewCommentsMiddleware = (id) => async (dispatch) => {
+  const response = await axios.get(
+    `https://jsonplaceholder.typicode.com/posts/:${id}/comments`
+  );
+  console.log("comments middleware response  : ", response);
+  dispatch({
+    type: viewComments,
+    payload: response.data,
+  });
+};
+
+export const newPostMiddleware = () => async (dispatch) => {
+  const response = await axios.post(
+    "https://jsonplaceholder.typicode.com/posts/:postId"
+  );
+  console.log("repsonse of new post : ", response);
 };
